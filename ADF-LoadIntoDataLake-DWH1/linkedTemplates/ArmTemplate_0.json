@@ -1,0 +1,302 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "ADF-LoadIntoDataLake-DWH1"
+		},
+		"FileServerLocalMachine1_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'FileServerLocalMachine1'"
+		},
+		"ADLSStoreLinkedService_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://datalakestorage2dwh1.dfs.core.windows.net"
+		},
+		"AzureKeyVault1_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://AKV1-localmachine.vault.azure.net/"
+		},
+		"AzureKeyVault2_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://AKV1-localmachine.vault.azure.net/"
+		},
+		"FileServerLocalMachine1_properties_typeProperties_host": {
+			"type": "string",
+			"defaultValue": "C:\\Ani\\Azure\\DataSource"
+		},
+		"FileServerLocalMachine1_properties_typeProperties_userId": {
+			"type": "string",
+			"defaultValue": "kanodiaani@gmail.com"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/ADLSStoreLinkedService')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('ADLSStoreLinkedService_properties_typeProperties_url')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureKeyVault1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('AzureKeyVault1_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureKeyVault2')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('AzureKeyVault2_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/integrationRuntime1')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ADLSParquet1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ADLSStoreLinkedService",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "Data Folder DWH",
+						"fileSystem": "sampledatacontainerdwh"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ADLSStoreLinkedService')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/FileServerLocalMachine1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "FileServer",
+				"typeProperties": {
+					"host": "[parameters('FileServerLocalMachine1_properties_typeProperties_host')]",
+					"userId": "[parameters('FileServerLocalMachine1_properties_typeProperties_userId')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('FileServerLocalMachine1_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "integrationRuntime1",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Excel1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "FileServerLocalMachine1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Excel",
+				"typeProperties": {
+					"sheetName": "Sheet1",
+					"location": {
+						"type": "FileServerLocation",
+						"fileName": "Source1.xlsx"
+					},
+					"firstRowAsHeader": true
+				},
+				"schema": [
+					{
+						"name": "CustomerId",
+						"type": "String"
+					},
+					{
+						"name": "CustomerName",
+						"type": "String"
+					},
+					{
+						"name": "Location",
+						"type": "String"
+					},
+					{
+						"name": "Total Revenue",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/FileServerLocalMachine1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Pipeline1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Pull data from file",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.01:00:00",
+							"retry": 3,
+							"retryIntervalInSeconds": 120,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "ExcelSource",
+								"storeSettings": {
+									"type": "FileServerReadSettings",
+									"recursive": true,
+									"wildcardFolderPath": "C:\\Ani\\Azure\\DataSource",
+									"wildcardFileName": "Source*",
+									"enablePartitionDiscovery": false
+								}
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings",
+									"copyBehavior": "MergeFiles"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "CustomerId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CustomerId",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "CustomerName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CustomerName",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "Location",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "Location",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "Total Revenue",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "Total Revenue",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "Excel1",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ADLSParquet1",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Excel1')]",
+				"[concat(variables('factoryId'), '/datasets/ADLSParquet1')]"
+			]
+		}
+	]
+}
