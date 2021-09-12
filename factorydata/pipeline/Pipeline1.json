@@ -26,13 +26,14 @@
 						}
 					},
 					"sink": {
-						"type": "ParquetSink",
+						"type": "DelimitedTextSink",
 						"storeSettings": {
-							"type": "AzureBlobFSWriteSettings",
-							"copyBehavior": "MergeFiles"
+							"type": "AzureBlobFSWriteSettings"
 						},
 						"formatSettings": {
-							"type": "ParquetWriteSettings"
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
 						}
 					},
 					"enableStaging": false,
@@ -46,9 +47,9 @@
 									"physicalType": "String"
 								},
 								"sink": {
-									"name": "CustomerId",
 									"type": "String",
-									"physicalType": "UTF8"
+									"physicalType": "UTF8",
+									"ordinal": 1
 								}
 							},
 							{
@@ -58,9 +59,9 @@
 									"physicalType": "String"
 								},
 								"sink": {
-									"name": "CustomerName",
 									"type": "String",
-									"physicalType": "UTF8"
+									"physicalType": "UTF8",
+									"ordinal": 2
 								}
 							},
 							{
@@ -70,9 +71,9 @@
 									"physicalType": "String"
 								},
 								"sink": {
-									"name": "Location",
 									"type": "String",
-									"physicalType": "UTF8"
+									"physicalType": "UTF8",
+									"ordinal": 3
 								}
 							},
 							{
@@ -82,9 +83,9 @@
 									"physicalType": "String"
 								},
 								"sink": {
-									"name": "Total Revenue",
 									"type": "String",
-									"physicalType": "UTF8"
+									"physicalType": "UTF8",
+									"ordinal": 4
 								}
 							}
 						],
@@ -103,7 +104,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "ADLSParquet1",
+						"referenceName": "DelimitedText1",
 						"type": "DatasetReference"
 					}
 				]
