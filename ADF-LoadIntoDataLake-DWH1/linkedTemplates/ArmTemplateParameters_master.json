@@ -8,6 +8,9 @@
 		"FileServerLocalMachine1_password": {
 			"value": ""
 		},
+		"ADLSDelimited1_accountKey": {
+			"value": ""
+		},
 		"ADLSStoreLinkedService_properties_typeProperties_url": {
 			"value": "https://datalakestorage2dwh1.dfs.core.windows.net"
 		},
@@ -22,6 +25,9 @@
 		},
 		"FileServerLocalMachine1_properties_typeProperties_userId": {
 			"value": "kanodiaani@gmail.com"
+		},
+		"ADLSDelimited1_properties_typeProperties_url": {
+			"value": "https://datalakestorage2dwh1.dfs.core.windows.net"
 		},
 		"containerUri": {
 			"value": ""

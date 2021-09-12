@@ -11,6 +11,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'FileServerLocalMachine1'"
 		},
+		"ADLSDelimited1_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ADLSDelimited1'"
+		},
 		"ADLSStoreLinkedService_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://datalakestorage2dwh1.dfs.core.windows.net"
@@ -30,6 +34,10 @@
 		"FileServerLocalMachine1_properties_typeProperties_userId": {
 			"type": "string",
 			"defaultValue": "kanodiaani@gmail.com"
+		},
+		"ADLSDelimited1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://datalakestorage2dwh1.dfs.core.windows.net"
 		}
 	},
 	"variables": {
@@ -66,13 +74,15 @@
 								}
 							},
 							"sink": {
-								"type": "ParquetSink",
+								"type": "DelimitedTextSink",
 								"storeSettings": {
 									"type": "AzureBlobFSWriteSettings",
 									"copyBehavior": "MergeFiles"
 								},
 								"formatSettings": {
-									"type": "ParquetWriteSettings"
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
 								}
 							},
 							"enableStaging": false,
@@ -144,7 +154,7 @@
 						],
 						"outputs": [
 							{
-								"referenceName": "ADLSParquet1",
+								"referenceName": "DelimitedText1",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
@@ -155,7 +165,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/Excel1')]",
-				"[concat(variables('factoryId'), '/datasets/ADLSParquet1')]"
+				"[concat(variables('factoryId'), '/datasets/DelimitedText1')]"
 			]
 		},
 		{
@@ -298,6 +308,52 @@
 				"typeProperties": {}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ADLSDelimited1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('ADLSDelimited1_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('ADLSDelimited1_accountKey')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DelimitedText1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ADLSDelimited1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "ADLSDelimited.txt",
+						"folderPath": "Data Folder DWH",
+						"fileSystem": "sampledatacontainerdwh"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ADLSDelimited1')]"
+			]
 		}
 	]
 }
