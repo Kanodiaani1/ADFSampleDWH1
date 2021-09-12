@@ -19,6 +19,23 @@
 			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
-		"schema": []
+		"schema": [
+			{
+				"name": "CustomerId",
+				"type": "String"
+			},
+			{
+				"name": "CustomerName",
+				"type": "String"
+			},
+			{
+				"name": "Location",
+				"type": "String"
+			},
+			{
+				"name": "Total Revenue",
+				"type": "String"
+			}
+		]
 	}
 }
