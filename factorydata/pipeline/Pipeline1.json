@@ -28,7 +28,8 @@
 					"sink": {
 						"type": "DelimitedTextSink",
 						"storeSettings": {
-							"type": "AzureBlobFSWriteSettings"
+							"type": "AzureBlobFSWriteSettings",
+							"copyBehavior": "MergeFiles"
 						},
 						"formatSettings": {
 							"type": "DelimitedTextWriteSettings",
@@ -47,9 +48,9 @@
 									"physicalType": "String"
 								},
 								"sink": {
+									"name": "CustomerId",
 									"type": "String",
-									"physicalType": "UTF8",
-									"ordinal": 1
+									"physicalType": "UTF8"
 								}
 							},
 							{
@@ -59,9 +60,9 @@
 									"physicalType": "String"
 								},
 								"sink": {
+									"name": "CustomerName",
 									"type": "String",
-									"physicalType": "UTF8",
-									"ordinal": 2
+									"physicalType": "UTF8"
 								}
 							},
 							{
@@ -71,9 +72,9 @@
 									"physicalType": "String"
 								},
 								"sink": {
+									"name": "Location",
 									"type": "String",
-									"physicalType": "UTF8",
-									"ordinal": 3
+									"physicalType": "UTF8"
 								}
 							},
 							{
@@ -83,9 +84,9 @@
 									"physicalType": "String"
 								},
 								"sink": {
+									"name": "Total Revenue",
 									"type": "String",
-									"physicalType": "UTF8",
-									"ordinal": 4
+									"physicalType": "UTF8"
 								}
 							}
 						],
