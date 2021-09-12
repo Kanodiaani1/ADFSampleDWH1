@@ -1,0 +1,20 @@
+{
+	"name": "ADLSParquet1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ADLSStoreLinkedService",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "Data Folder DWH",
+				"fileSystem": "sampledatacontainerdwh"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
