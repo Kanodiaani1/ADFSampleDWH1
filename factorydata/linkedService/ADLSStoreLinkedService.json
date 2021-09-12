@@ -1,0 +1,10 @@
+{
+	"name": "ADLSStoreLinkedService",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://datalakestorage2dwh1.dfs.core.windows.net"
+		}
+	}
+}
