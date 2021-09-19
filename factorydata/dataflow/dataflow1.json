@@ -12,9 +12,21 @@
 					"name": "source1"
 				}
 			],
-			"sinks": [],
-			"transformations": [],
-			"script": "source(output(\n\t\tCustomerId as string,\n\t\tCustomerName as string,\n\t\tLocation as string,\n\t\t{Total Revenue} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: true,\n\tlimit: 100,\n\tignoreNoFilesFound: false) ~> source1"
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ADLSParquet1",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "DerivedColumn1"
+				}
+			],
+			"script": "source(output(\n\t\tCustomerId as string,\n\t\tCustomerName as string,\n\t\tLocation as string,\n\t\t{Total Revenue} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: true,\n\tlimit: 100,\n\tignoreNoFilesFound: false) ~> source1\nsource1 derive({Total Revenue} = toInteger({Total Revenue}),\n\t\tcolumn2 = ERROR_FUNCTION('')) ~> DerivedColumn1\nDerivedColumn1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\ttruncate: true,\n\tpreCommands: [],\n\tpostCommands: [],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sink1"
 		}
 	}
 }
