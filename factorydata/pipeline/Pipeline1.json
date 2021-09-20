@@ -123,6 +123,8 @@
 				"dependsOn": [],
 				"userProperties": [],
 				"typeProperties": {
+					"isSequential": false,
+					"batchCount": 2,
 					"activities": [
 						{
 							"name": "Copy data1",
@@ -137,8 +139,22 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
+								"source": {
+									"type": "ExcelSource",
+									"storeSettings": {
+										"type": "FileServerReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false
+									}
+								},
 								"enableStaging": false
-							}
+							},
+							"inputs": [
+								{
+									"referenceName": "Excel1",
+									"type": "DatasetReference"
+								}
+							]
 						}
 					]
 				}
